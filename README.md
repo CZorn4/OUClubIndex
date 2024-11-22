@@ -1,4 +1,4 @@
-# GoonFinder
+# OUClubIndex
 
 A Python utility that scrapes and aggregates leadership information from OU student organizations, enabling efficient outreach to club officers and sponsors.
 
