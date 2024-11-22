@@ -22,7 +22,8 @@ def get_clubs(CLUB_URL):
                 "name": item["Name"],
                 "description": item["Description"],
                 "id": item["Id"],
-                "goons": []
+                "goons": [],
+                "advisors": []
             }
             clubs.append(club)
         
@@ -50,7 +51,7 @@ def get_goons(clubs, BASE_URL, headers=HEADERS, cookies=COOKIES):
             
             data = response.json()
             
-            # Check if we have the items key in the response, dont know if it will ever not be but I was getting get errors
+            # Check if we have the items key in the response, dont know if it will ever not be but I was getting gettype errors
             items = data.get('items', [])
             if not items:
                 print(f"No goons found for {club['name']}")
@@ -62,24 +63,19 @@ def get_goons(clubs, BASE_URL, headers=HEADERS, cookies=COOKIES):
                     if not holders:
                         continue
                     
-                    # Found out holders can be a list after a billion years of death and despair
-                    if isinstance(holders, list):
-                        for holder in holders:
-                            goon = {
-                                "first_name": holder.get('firstName', ''),
-                                "last_name": holder.get('lastName', ''),
-                                "email": holder.get('primaryEmailAddress', ''),
-                                "status": "Sponsor" if not item.get('isOfficer') else item.get('name', 'Officer')
-                            }
-                            club['goons'].append(goon)
-                    else:
+                    target_list = club['goons'] if item.get('isOfficer') else club['advisors']
+
+                    # Found out holders can be a list OR single object after a billion years of death and despair
+                    holders_list = holders if isinstance(holders, list) else [holders]
+
+                    for holder in holders_list:
                         goon = {
-                            "first_name": holders.get('firstName', ''),
-                            "last_name": holders.get('lastName', ''),
-                            "email": holders.get('primaryEmailAddress', ''),
-                            "status": "Sponsor" if not item.get('isOfficer') else item.get('name', 'Officer')
+                            "first_name": holder.get('firstName', ''),
+                            "last_name": holder.get('lastName', ''),
+                            "email": holder.get('primaryEmailAddress', ''),
+                            "status": item.get('name', 'Officer')
                         }
-                        club['goons'].append(goon)
+                        target_list.append(goon)
                         
                 except Exception as e:
                     print(f"Error processing goon in {club['name']}: {e}")
