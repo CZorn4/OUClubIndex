@@ -1,0 +1,5 @@
+# config files
+config.py
+
+# JSON files
+*.json
